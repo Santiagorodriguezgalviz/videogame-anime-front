@@ -11,9 +11,8 @@ import { CommonModule } from '@angular/common';
 })
 export class InicioComponent {
   featuredCharacters = [
-    { name: 'Gojo Satoru', game: 'Jujutsu Kaisen: Phantom Parade', image: './assets/images/Eren.jpg' },
-    { name: 'Naruto Uzumaki', game: 'Naruto Ultimate Ninja Storm', image: './assets/images/naruto-uzumaki.jpg' },
-    { name: 'Tanjiro Kamado', game: 'Demon Slayer: Kimetsu no Yaiba', image: './assets/images/tanjiro-kamado.jpg' },
-    // Puedes agregar más personajes según sea necesario
+    { name: 'Eren Yeager', game: 'Attack on Titan', image: 'Eren.jpg' },
+    { name: 'Nagisa Shiota', game: 'Assassination Classroom', image: 'Nagisa.jpg' },
+    { name: 'Saitama', game: 'One Punch Man', image: 'saitama.jpg' }
   ];
 }

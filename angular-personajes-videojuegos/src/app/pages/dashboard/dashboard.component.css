@@ -59,3 +59,114 @@
     font-size: 12px;
     color: #999;
   }
+
+/* Estilos para el título principal */
+.title {
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 40px;
+  font-weight: bold;
+  font-size: 48px;
+  text-shadow: 0 0 10px rgba(157, 114, 114, 0.5);
+}
+
+/* Contenedor principal */
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  padding: 20px;
+}
+
+/* Estilos de la tarjeta */
+.card {
+  background: linear-gradient(145deg, #4a0e8f, #3700b3);
+  color: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 300px;
+  text-align: center;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Imagen de la tarjeta */
+.card-img-top {
+  border-radius: 15px;
+  height: 200px;
+  width: 100%;
+  object-fit: cover;
+  margin-bottom: 15px;
+}
+
+/* Título de la tarjeta */
+.card-title {
+  font-size: 1.4em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #ffffff;
+}
+
+/* Texto de la tarjeta */
+.card-text {
+  color: #e0e0e0;
+  font-size: 1em;
+  margin-bottom: 15px;
+}
+
+/* Contenedor de botones */
+.card-actions {
+  display: flex;
+  justify-content: space-around;
+  margin-top: auto;
+}
+
+/* Estilos de botones */
+.btn-edit,
+.btn-delete {
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-size: 0.9em;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  border: none;
+  text-transform: uppercase;
+}
+
+.btn-edit {
+  background-color: #00c853;
+  color: white;
+}
+
+.btn-edit:hover {
+  background-color: #00e676;
+  box-shadow: 0 0 15px rgba(0, 230, 118, 0.5);
+}
+
+.btn-delete {
+  background-color: #ff1744;
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #ff4081;
+  box-shadow: 0 0 15px rgba(255, 23, 68, 0.5);
+}
+
+/* Estilos para el fondo del dashboard */
+:host {
+  display: block;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #6200ea, #3700b3);
+  padding: 40px;
+}
+

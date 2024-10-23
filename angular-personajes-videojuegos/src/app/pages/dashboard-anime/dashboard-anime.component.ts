@@ -37,8 +37,17 @@ export class DashboardAnimeComponent {
 
   private apiUrl = 'https://localhost:44357/api/Personajes';
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {
+  // Propiedades para el filtro y paginación
+  filtro = '';
+  personajesFiltrados: any[] = [];
+  paginaActual: number = 1;
+  personajesPorPagina: number = 8;
 
+  totalPaginas: number; // Asegúrate de inicializar esta propiedad adecuadamente
+
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {
+    // Inicializa totalPaginas basado en tus datos o lógica
+    this.totalPaginas = this.calcularTotalPaginas();
   }
 
   ngOnInit(): void {
@@ -58,15 +67,25 @@ export class DashboardAnimeComponent {
   getPersonajes(): void {
     this.http.get<any[]>(this.apiUrl).subscribe(
       (personajes) => {
-        this.personajes = personajes; // Asigna correctamente a this.personajes
-        this.cdr.detectChanges(); // Llama a detectChanges si es necesario
+        this.personajes = personajes;
+        this.filtrarPersonajes(); // Filtrar personajes después de obtenerlos
+        this.cdr.detectChanges();
       },
       (error) => {
         console.error('Error fetching personajes:', error);
       }
     );
   }
-  
+
+  filtrarPersonajes(): void {
+    this.personajesFiltrados = this.personajes.filter(personaje =>
+      personaje.nombre.toLowerCase().includes(this.filtro.toLowerCase()) ||
+      personaje.clase.toLowerCase().includes(this.filtro.toLowerCase()) ||
+      personaje.nivel.toString().includes(this.filtro)
+    );
+    // Recalcular el total de páginas después de filtrar
+    this.totalPaginas = this.calcularTotalPaginas();
+  }
 
   onSubmit(form: NgForm): void {
 
@@ -154,4 +173,13 @@ export class DashboardAnimeComponent {
     };
   }
 
+  cambiarPagina(numero: number) {
+    this.paginaActual = numero;
+  }
+
+  calcularTotalPaginas(): number {
+    // Implementa la lógica para calcular el total de páginas
+    // Por ejemplo, si tienes un array de personajes y una variable para personajes por página
+    return Math.ceil(this.personajesFiltrados.length / this.personajesPorPagina);
+  }
 }

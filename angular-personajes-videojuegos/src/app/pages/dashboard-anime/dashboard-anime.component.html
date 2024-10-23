@@ -1,12 +1,19 @@
 <h2 class="title">Lista de Personajes</h2>
 
 <div class="top-container">
-  <button class="btn btn-success add-btn" (click)="openModal()">Agregar nuevo <i class="fas fa-plus"></i></button>
+  <div class="search-container">
+    <input type="text" [(ngModel)]="filtro" (input)="filtrarPersonajes()" placeholder="Buscar por nombre, clase o nivel..." class="search-input">
+    <button class="btn-add" (click)="openModal()">
+      <i class="fas fa-plus"></i> Agregar nuevo
+    </button>
+  </div>
 </div>
+
+<!-- Agregar paginación aquí si es necesario -->
 
 <!-- Sección para mostrar tarjetas de personajes -->
 <div class="card-container">
-  <div class="card" *ngFor="let personaje of personajes">
+  <div class="card" *ngFor="let personaje of personajesFiltrados | slice:(paginaActual - 1) * personajesPorPagina : paginaActual * personajesPorPagina">
     <img [src]="personaje.imagen" class="card-img-top" [alt]="personaje.nombre">
     <h5 class="card-title">{{personaje.nombre}}</h5>
     <p class="card-text">Nivel: {{personaje.nivel}}</p>
@@ -19,6 +26,29 @@
   </div>
 </div>
 
+
+<!-- Controles de paginación con iconos y números de página -->
+<div class="pagination-container">
+  <button class="pagination-btn" (click)="cambiarPagina(1)" [disabled]="paginaActual === 1">
+    <i class="fas fa-angle-double-left"></i>
+  </button>
+  <button class="pagination-btn" (click)="cambiarPagina(paginaActual - 1)" [disabled]="paginaActual === 1">
+    <i class="fas fa-angle-left"></i>
+  </button>
+  <!-- Ejemplo de paginación numérica -->
+  <ng-container *ngFor="let num of [paginaActual-2, paginaActual-1, paginaActual, paginaActual+1, paginaActual+2]; let i = index">
+    <button *ngIf="num > 0 && num <= totalPaginas" class="pagination-btn" [class.active]="num === paginaActual" (click)="cambiarPagina(num)">
+      {{ num }}
+    </button>
+  </ng-container>
+  <button class="pagination-btn" (click)="cambiarPagina(paginaActual + 1)" [disabled]="paginaActual * personajesPorPagina >= personajesFiltrados.length">
+    <i class="fas fa-angle-right"></i>
+  </button>
+  <button class="pagination-btn" (click)="cambiarPagina(totalPaginas)" [disabled]="paginaActual * personajesPorPagina >= personajesFiltrados.length">
+    <i class="fas fa-angle-double-right"></i>
+  </button>
+</div>
+
 <!-- Modal -->
 <div id="personModal" class="modal" [ngClass]="{'show-modal': isModalOpen}">
   <div class="modal-content">
@@ -29,36 +59,59 @@
     <form #personForm="ngForm" (ngSubmit)="onSubmit(personForm)" novalidate>
       <input type="hidden" name="id" [(ngModel)]="personaje.id">
       <div class="modal-body">
-        <div class="mb-3">
-          <label for="nombre" class="form-label">Nombre</label>
-          <input type="text" class="form-control" id="nombre" [(ngModel)]="personaje.nombre" name="nombre" required>
+        <div class="form-group">
+          <label for="nombre" class="form-label input-label">Nombre</label>
+          <input type="text" class="form-control" id="nombre" [(ngModel)]="personaje.nombre" name="nombre" required #nombre="ngModel" [ngClass]="{'is-invalid': nombre.invalid && (nombre.dirty || nombre.touched)}">
+          <div class="invalid-feedback" *ngIf="nombre.invalid && (nombre.dirty || nombre.touched)">
+            <i class="fas fa-exclamation-circle"></i> Por favor, ingrese un nombre válido.
+          </div>
         </div>
-        <div class="mb-3">
-          <label for="nivel" class="form-label">Nivel</label>
-          <input type="number" class="form-control" id="nivel" [(ngModel)]="personaje.nivel" name="nivel" required>
+        
+        <div class="form-group">
+          <label for="nivel" class="form-label input-label">Nivel</label>
+          <input type="number" class="form-control" id="nivel" [(ngModel)]="personaje.nivel" name="nivel" required min="1" max="100" #nivel="ngModel" [ngClass]="{'is-invalid': nivel.invalid && (nivel.dirty || nivel.touched)}">
+          <div class="invalid-feedback" *ngIf="nivel.invalid && (nivel.dirty || nivel.touched)">
+            <i class="fas fa-exclamation-circle"></i>
+            <span *ngIf="nivel.errors?.['required']">El nivel es requerido.</span>
+            <span *ngIf="nivel.errors?.['min'] || nivel.errors?.['max']">El nivel debe estar entre 1 y 100.</span>
+          </div>
         </div>
-        <div class="mb-3">
-          <label for="clase" class="form-label">Clase</label>
-          <select class="form-select" [(ngModel)]="personaje.clase" name="clase" required>
+        
+        <div class="form-group">
+          <label for="clase" class="form-label input-label">Clase</label>
+          <select class="form-select" [(ngModel)]="personaje.clase" name="clase" required #clase="ngModel" [ngClass]="{'is-invalid': clase.invalid && (clase.dirty || clase.touched)}">
+            <option value="" disabled selected>Seleccione una opción</option>
             <option value="Guerrero">Guerrero</option>
             <option value="Asesino">Asesino</option>
             <option value="Mago">Mago</option>
           </select>
+          <div class="invalid-feedback" *ngIf="clase.invalid && (clase.dirty || clase.touched)">
+            <i class="fas fa-exclamation-circle"></i> Por favor, seleccione una clase.
+          </div>
         </div>
-        <div class="mb-3">
-          <label for="habilidades" class="form-label">Habilidades</label>
-          <input type="text" class="form-control" id="habilidades" [(ngModel)]="personaje.habilidades" name="habilidades" required>
+        
+        <div class="form-group">
+          <label for="habilidades" class="form-label input-label">Habilidades</label>
+          <input type="text" class="form-control" id="habilidades" [(ngModel)]="personaje.habilidades" name="habilidades" required #habilidades="ngModel" [ngClass]="{'is-invalid': habilidades.invalid && (habilidades.dirty || habilidades.touched)}">
+          <div class="invalid-feedback" *ngIf="habilidades.invalid && (habilidades.dirty || habilidades.touched)">
+            <i class="fas fa-exclamation-circle"></i> Por favor, ingrese al menos una habilidad.
+          </div>
         </div>
-        <div class="mb-3">
-          <label for="imagen" class="form-label">Imagen</label>
+        
+        <div class="form-group">
+          <label for="imagen" class="form-label input-label">Imagen</label>
           <input type="file" class="form-control" id="imagen" (change)="onFileChange($event)" accept="image/png, image/jpeg">
-          <img *ngIf="personaje.imagen" [src]="personaje.imagen" alt="Vista previa" class="img-preview">
-          <button type="button" class="btn btn-danger mt-2" *ngIf="personaje.imagen" (click)="removeImage()">Remover imagen</button>
+          <img *ngIf="personaje.imagen" [src]="personaje.imagen" alt="Vista previa" class="img-preview mt-2">
+          <button type="button" class="btn btn-outline-danger btn-sm mt-2" *ngIf="personaje.imagen" (click)="removeImage()">
+            <i class="fas fa-trash-alt"></i> Remover imagen
+          </button>
         </div>
         
         <div class="modal-footer">
-          <button type="button" class="btn-delete" (click)="closeModal()">Cerrar</button>
-          <button type="submit" class="btn-edit">Guardar</button>
+          <button type="button" class="btn-delete " (click)="closeModal()">Cerrar</button>
+          <button type="submit" class="btn-edit" [disabled]="!personForm.form.valid">
+            <i class="fas fa-save"></i> Guardar
+          </button>
         </div>
       </div>
     </form>
